@@ -12,11 +12,17 @@ namespace THX_Service_Manager
     {
         #region Static Vars
         internal static NotifyIcon NotificationObject = new NotifyIcon();
-        internal static readonly string[] PrefixBlacklist = new string[] { "Razer Synapse", "THXHelper", "audiodg", "RZSurroundHelper", "RZSurroundHelper" };
+        internal static readonly string[] PrefixBlacklist = new string[] { "Razer Synapse Service Pro", "THXHelper", "audiodg", "RZSurroundHelper" };
+        //Razer Synapse 3 and THXService are restarted by ServiceControllers 
+
+
+        //C:\Program Files (x86)\Razer\Synapse3\Service\Razer Synapse Service.exe
+
         internal static ServiceController Synapse = new ServiceController("Razer Synapse Service");
         internal static ServiceController THX = new ServiceController("THXService");
-        #endregion
+        internal static ServiceController RzSndSrv = new ServiceController("RzSndSrv");
 
+        #endregion
         #region Helpers
         internal static void Displaynotify(string Product, string Title, string Text, int ShowTime)
         {
@@ -33,15 +39,15 @@ namespace THX_Service_Manager
         static void Main()
         {
             //lets notify the user
-            Displaynotify("THX-Patcher", "THX PATCHER", "restarting THX related services...", 2500);
+            Displaynotify("THX-Patcher", "THX Restarter", "restarting THX related services...", 2500);
 
-            //stop Synapse & THX
             if (Synapse.CanStop) Synapse.Stop();
             if (THX.CanStop) THX.Stop();
+            if (RzSndSrv.CanStop) RzSndSrv.Stop(); 
 
-            //start Synapse & THX
             if (Synapse.Status != ServiceControllerStatus.Running) Synapse.Start();
             if (THX.Status != ServiceControllerStatus.Running) THX.Start();
+            if (RzSndSrv.Status != ServiceControllerStatus.Running) RzSndSrv.Start();
 
             //now lets kill & restart the associated programs (filepath taken from process object so we dont need to check what version / headset)
             foreach (var process in Process.GetProcesses())
@@ -60,7 +66,7 @@ namespace THX_Service_Manager
                 }
             }
 
-            Displaynotify("THX-Patcher", "THX PATCHER", "Done!", 2500);
+            Displaynotify("THX-Service", "THX Restarter", "Done!", 2500);
             Task.Delay(2600);
         }
         #endregion
